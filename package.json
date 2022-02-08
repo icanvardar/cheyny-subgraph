@@ -1,5 +1,5 @@
 {
-  "name": "Cheyny",
+  "name": "cheyny",
   "license": "UNLICENSED",
   "scripts": {
     "codegen": "graph codegen",
