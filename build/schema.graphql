@@ -27,32 +27,32 @@ type Transfer @entity {
 
 type MintItem @entity {
   id: ID!
-  tokenId: BigInt!
-  issuer: Bytes!
-  tokenUri: Bytes!
+  tokenId: BigInt! # uint256
+  issuer: Bytes! # address
+  tokenUri: Bytes! # string
 }
-
-# type ClaimIssuer @entity {
-#   id: ID!
-#   newIssuer: Bytes!
-# }
-
-# type DisclaimIssuer @entity {
-#   id: ID!
-#   issuer: Bytes!
-# }
 
 type Token @entity {
   id: ID!
-  tokenID: BigInt!
-  tokenURI: String!
-  createdAtTimestamp: BigInt!
+  tokenID: BigInt! # uint256
+  tokenURI: String! # string
+  createdAtTimestamp: BigInt! # uint256
   creator: User!
   owner: User!
+  histories: [History!]! @derivedFrom(field: "tokenID")
 }
 
 type User @entity {
   id: ID!
   tokens: [Token!]! @derivedFrom(field: "owner")
   created: [Token!]! @derivedFrom(field: "creator")
+}
+
+type History @entity {
+  id: ID!
+  tokenID: Token! 
+  action: String!
+  from: User!
+  to: User!
+  createdAtTimestamp: BigInt!
 }

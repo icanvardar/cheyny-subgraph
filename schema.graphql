@@ -39,10 +39,20 @@ type Token @entity {
   createdAtTimestamp: BigInt! # uint256
   creator: User!
   owner: User!
+  histories: [History!]! @derivedFrom(field: "tokenID")
 }
 
 type User @entity {
   id: ID!
   tokens: [Token!]! @derivedFrom(field: "owner")
   created: [Token!]! @derivedFrom(field: "creator")
+}
+
+type History @entity {
+  id: ID!
+  tokenID: Token! 
+  action: String!
+  from: User!
+  to: User!
+  createdAtTimestamp: BigInt!
 }

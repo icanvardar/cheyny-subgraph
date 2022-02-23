@@ -11,6 +11,7 @@ import {
   Transfer,
   User,
   Token,
+  History,
 } from "../generated/schema";
 
 export function handleApproval(event: ApprovalEvent): void {
@@ -42,9 +43,27 @@ export function handleTransfer(event: TransferEvent): void {
   entity.tokenId = event.params.tokenId;
   entity.save();
 
-  let token = Token.load(event.params.tokenId.toHexString());
-  token!.owner = event.params.to.toHexString();
-  token!.save();
+  let token = Token.load(event.params.tokenId.toString());
+  let user = User.load(event.params.to.toHexString());
+
+  if (!user) {
+    let user = new User(event.params.to.toHexString());
+    user.save();
+  }
+
+  if (token) {
+    token.owner = event.params.to.toHexString();
+    token.save();
+  }
+
+  let history = new History(event.transaction.hash.toHexString());
+
+  history.action = "TRANSFER";
+  history.createdAtTimestamp = event.block.timestamp;
+  history.from = event.params.from.toHexString();
+  history.to = event.params.to.toHexString();
+  history.tokenID = event.params.tokenId.toString();
+  history.save();
 }
 
 export function handleMintItem(event: MintItemEvent): void {
@@ -61,6 +80,15 @@ export function handleMintItem(event: MintItemEvent): void {
   token.save();
 
   let user = User.load(event.params.issuer.toHexString());
+  let history = new History(event.transaction.hash.toHexString());
+
+  history.action = "MINT";
+  history.createdAtTimestamp = event.block.timestamp;
+  history.from = event.params.issuer.toHexString();
+  history.to = event.params.issuer.toHexString();
+  history.tokenID = event.params.tokenId.toString();
+  history.save();
+
   if (!user) {
     user = new User(event.params.issuer.toHexString());
     user.save();
